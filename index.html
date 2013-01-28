@@ -24,6 +24,8 @@ th, td {
 <script src="jstat.js"></script>
 <script>
 
+var array_size = 200
+
 function drawCanvas(w, h) {
     var c = $('<canvas/>').attr('width', w).attr('height', h)
     c.css('position', 'absolute')
@@ -110,7 +112,7 @@ function betaMean(B) {
 }
 
 function betaToArr(B, n) {
-    if (!n) n = 200
+    if (!n) n = array_size
     var arr = []
     for (var i = 0; i < n; i++) {
         arr.push(jStat.ibetainv(_.lerp(0, 0, n - 1, 1, i), B.a, B.b))
@@ -197,12 +199,23 @@ function subjToArr(S) {
 }
 
 $(function () {
-    var x = createBeta(3, 5)
-    var y = createBeta(6, 1)
-    var z = createBeta(5, 2)
+    array_size = 200
 
-    drawGraph(arrMul(betaToArr(x), arrMul(betaToArr(y), betaToArr(z))), 'rgba(255, 0, 0, 0.5)')
-    drawGraph(subjToArr(subjMul(betaToSubj(x), subjMul(betaToSubj(y), betaToSubj(z)))), 'rgba(0, 0, 255, 0.5)')
+    $('body').append($('<button/>').text('multiply betas!').click(function () {
+        $(this).remove()
+        var x = createBeta(3, 5)
+        var y = createBeta(6, 1)
+        var z = createBeta(5, 2)
+
+        var b = arrMul(betaToArr(x), arrMul(betaToArr(y), betaToArr(z)))
+        var s = subjMul(betaToSubj(x), subjMul(betaToSubj(y), betaToSubj(z)))
+
+        drawGraph(b, 'rgba(255, 0, 0, 0.5)')
+        drawGraph(subjToArr(s), 'rgba(0, 0, 255, 0.5)')
+
+        console.log("b mean = " + arrMean(b))
+        console.log("s mean = " + betaMean(subjToBeta(s)))
+    }))
 })
 
 </script>
